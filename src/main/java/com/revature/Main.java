@@ -1,6 +1,7 @@
 package com.revature;
 
 import com.revature.Models.Account;
+import com.revature.Models.Ticket;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -39,7 +40,7 @@ public class Main{
         });
 
         // Login to an account from form parameters, return a cookie to a user
-           app.post("/login", (Context ctx) -> {
+        app.post("/login", (Context ctx) -> {
                 
             // Get form parameters
             String username = ctx.formParam("username");
@@ -53,15 +54,41 @@ public class Main{
                 ctx.result("Invalid Credentials");
             }
 
-           });
+        });
 
-           // clear cookieStore to logout
-           app.post("/logout", (Context ctx) -> {
+        // clear cookieStore to logout
+        app.post("/logout", (Context ctx) -> {
+            String username = ctx.cookieStore().get("username");
+            ctx.cookieStore().clear();
+            if (username == null) ctx.result("You're not logged in");
+            else ctx.result("User "+username+" has been logged out");
+        });
+
+        // Sumbit a new ticket
+        app.post("/submit-ticket", (Context ctx) -> {
+
+            // try/catch needed to validate amount input
+            try {
+                // Get username from cookie
                 String username = ctx.cookieStore().get("username");
-                ctx.cookieStore().clear();
-                if (username == null) ctx.result("You're not logged in");
-                else ctx.result("User "+username+" has been logged out");
-           });
+                // Get form parameters
+                float amount = Float.parseFloat(ctx.formParam("amount"));
+                String description = ctx.formParam("description");
+
+                if (username == null) {
+                    ctx.result("ERROR: Please login before submitting a ticket.");
+                } else if (description.equals("")) {
+                    ctx.result("ERROR: Description cannot be blank.");
+                } else {
+                    Ticket ticket = new Ticket(null, username, amount, description, "Pending");
+                    if (Database.createTicket(ticket)) ctx.result("Ticket submitted successfully.");
+                }
+            }
+            catch (NumberFormatException e){
+                ctx.result("ERROR: Invalid amount");
+            }
+        });
+        
     }
 }
 

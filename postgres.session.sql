@@ -22,7 +22,7 @@ INSERT INTO ticket_status VALUES('Denied');
 -- One record per ticket
 CREATE TABLE ticket(
     ticket_id SERIAL PRIMARY KEY,
-    ticket_employee VARCHAR NOT NULL REFERENCES account(account_username),
+    ticket_username VARCHAR NOT NULL REFERENCES account(account_username),
     ticket_amount NUMERIC NOT NULL,
     ticket_description VARCHAR NOT NULL,
     ticket_status VARCHAR NOT NULL REFERENCES ticket_status(ticket_status_type)

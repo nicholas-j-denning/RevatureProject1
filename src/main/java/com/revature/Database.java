@@ -140,4 +140,36 @@ public class Database {
         return result;
     }
 
+    // add a record to the ticket table
+    public static boolean createTicket(Ticket ticket){
+        boolean result = false;
+        Statement stmt = null;
+        String SQL = "INSERT INTO ticket VALUES(" 
+            + "DEFAULT, '" // Auto increments SQL SERIAL type
+            + ticket.getUsername() + "', "
+            + ticket.getAmount() + ", '"
+            + ticket.getDescription() + "', '"
+            + ticket.getStatus() + "');";
+
+		try(Connection conn = DriverManager.getConnection(
+				System.getenv("url"), 
+				System.getenv("db_username"), 
+				System.getenv("db_password")
+			)) {
+
+			stmt = conn.createStatement();
+			stmt.execute(SQL);
+            result = true;
+	
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				stmt.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}    
+        return result;
+    }
 }
