@@ -2,7 +2,7 @@ package com.revature;
 
 import com.revature.Models.Account;
 import com.revature.Models.Ticket;
-
+import java.util.List;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -86,6 +86,41 @@ public class Main{
             }
             catch (NumberFormatException e){
                 ctx.result("ERROR: Invalid amount");
+            }
+        });
+
+        // view pending tickets, only available to account type Finance Manager
+        app.get("/tickets", (Context ctx) -> {
+            String username = ctx.cookieStore().get("username");
+            if (username == null) {
+                ctx.result("ERROR: Please login to view tickets.");
+            } else if (Database.isManager(username)) {
+                List<Ticket> tickets = Database.listPendingTickets();
+                ctx.json(tickets);
+            } else {
+                ctx.result("ERROR: You don't have permission to view tickets.");
+            }
+        });
+
+        // approve or deny a pending ticket, only available to account type Finance Manager
+        app.post("/tickets", (Context ctx) -> {
+            try{
+                String username = ctx.cookieStore().get("username");
+                int id = Integer.parseInt(ctx.formParam("id"));
+                String status = ctx.formParam("status");
+                if (username == null) {
+                    ctx.result("ERROR: Please login to process tickets.");
+                } else if (!status.equals("Approved")&&!status.equals("Denied")){
+                    ctx.result("ERROR: Ticked status must be 'Approved' or 'Denied'.");
+                } else if (Database.isManager(username)) {
+                    if (Database.updateTicketStatus(id,status))
+                        ctx.result("Ticket "+id+" "+status+".");
+                    else ctx.result("Ticket "+id+" is not Pending.");
+                } else {
+                    ctx.result("ERROR: You don't have permission to process tickets.");
+                }
+            } catch (NumberFormatException e) {
+                ctx.result("ERROR: Invalid id");
             }
         });
         
