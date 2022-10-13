@@ -2,7 +2,6 @@ package com.revature;
 
 import com.revature.Models.Account;
 
-import com.revature.Database;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -34,10 +33,8 @@ public class Main{
                 ctx.result("ERROR: Invalid role.");
             } else {
                 // If input is vald, add account the the database
-                // TODO: 
                 Account account = new Account(username, password.hashCode(), legalName, role);
-                Boolean b = Database.createAccount(account);
-                ctx.result(b.toString());
+                if(Database.createAccount(account)) ctx.result("Account created.");
             };
         });
 

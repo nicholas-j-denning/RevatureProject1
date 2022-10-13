@@ -57,7 +57,7 @@ public class Database {
 
 			stmt = conn.createStatement();
 			set = stmt.executeQuery(SQL);
-            Set<String> roles = new HashSet();
+            Set<String> roles = new HashSet<>();
             while(set.next()) roles.add(set.getString(1));
             result = !roles.contains(role);
 	
@@ -91,7 +91,8 @@ public class Database {
 			)) {
 
 			stmt = conn.createStatement();
-            result = stmt.execute(SQL);
+			stmt.execute(SQL);
+            result = true;
 	
 		}catch(SQLException e) {
 			e.printStackTrace();
