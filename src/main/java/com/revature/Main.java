@@ -38,7 +38,30 @@ public class Main{
             };
         });
 
+        // Login to an account from form parameters, return a cookie to a user
+           app.post("/login", (Context ctx) -> {
+                
+            // Get form parameters
+            String username = ctx.formParam("username");
+            String password= ctx.formParam("password");
+            
+            // Check username and password and return a cookie
+            if (Database.isLoginValid(username, password)){
+                ctx.cookieStore().set("username", username);
+                ctx.result("Login Successful");
+            } else {
+                ctx.result("Invalid Credentials");
+            }
 
+           });
+
+           // clear cookieStore to logout
+           app.post("/logout", (Context ctx) -> {
+                String username = ctx.cookieStore().get("username");
+                ctx.cookieStore().clear();
+                if (username == null) ctx.result("You're not logged in");
+                else ctx.result("User "+username+" has been logged out");
+           });
     }
 }
 

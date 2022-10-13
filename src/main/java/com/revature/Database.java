@@ -105,5 +105,39 @@ public class Database {
 		}    
         return result;
     }
-    
+   
+	public static boolean isLoginValid(String username, String password){
+        boolean result = false;
+        Statement stmt = null;
+		ResultSet set = null;
+        String SQL = "SELECT account_password_hash FROM account WHERE account_username='" + username +"'";
+
+		try(Connection conn = DriverManager.getConnection(
+				System.getenv("url"), 
+				System.getenv("db_username"), 
+				System.getenv("db_password")
+			)) {
+
+			stmt = conn.createStatement();
+			set = stmt.executeQuery(SQL);
+            if (set.next()) {
+				int passwordHash = set.getInt("account_password_hash");
+				int inputHash = password.hashCode();
+				result = (passwordHash == inputHash);
+			}
+
+	
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				set.close();
+				stmt.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+        return result;
+    }
+
 }
