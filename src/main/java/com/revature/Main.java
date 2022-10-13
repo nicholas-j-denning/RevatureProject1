@@ -124,6 +124,16 @@ public class Main{
             }
         });
         
+        // view tickets beloning to an employee
+        app.get("/my-tickets", (Context ctx) -> {
+            String username = ctx.cookieStore().get("username");
+            if (username == null) {
+                ctx.result("ERROR: Please login to view tickets.");
+            } else {
+                List<Ticket> tickets = Database.listEmployeeTickets(username);
+                ctx.json(tickets);
+            }  
+        });
     }
 }
 

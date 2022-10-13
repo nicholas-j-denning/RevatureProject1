@@ -206,7 +206,7 @@ public class Database {
         return result;
     }
 
-    // return true if username is already in account table
+    // return a List of all pending tickets
     public static List<Ticket> listPendingTickets(){
         Statement stmt = null;
 		ResultSet set = null;
@@ -276,6 +276,43 @@ public class Database {
 			}
 		}    
         return result;
+    }
+
+    // return true if username is already in account table
+    public static List<Ticket> listEmployeeTickets(String employee){
+        Statement stmt = null;
+		ResultSet set = null;
+        String SQL = "SELECT * FROM ticket WHERE ticket_username='"+employee+"'";
+		List<Ticket> tickets = new ArrayList<>();
+
+		try(Connection conn = DriverManager.getConnection(
+				System.getenv("url"), 
+				System.getenv("db_username"), 
+				System.getenv("db_password")
+			)) {
+
+			stmt = conn.createStatement();
+			set = stmt.executeQuery(SQL);
+			while(set.next()){
+				int id = set.getInt("ticket_id");
+				String username = set.getString("ticket_username");
+				float amount = set.getInt("ticket_amount");
+				String description = set.getString("ticket_description");
+				String status = set.getString("ticket_status");
+				tickets.add(new Ticket(id, username, amount, description, status));
+			}
+	
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				set.close();
+				stmt.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return tickets;
     }
 
 }
