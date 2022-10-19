@@ -1,3 +1,4 @@
+// TODO: clean up db, Hash.hash(), hash username in cookie, tests
 package com.revature;
 
 import com.revature.Models.Account;
@@ -22,7 +23,9 @@ public class Main{
             String role = ctx.formParam("role");
 
             // Basic validity checks on input
-            if (username.equals("")){
+            if (username==null||password==null||legalName==null||role==null) {
+                ctx.result("ERROR: Missing form parameters.");
+            } else if (username.equals("")){
                 ctx.result("ERROR: Username cannot be blank.");
             } else if (Database.usernameExists(username)){
                 ctx.result("ERROR: Username is already taken.");
@@ -47,7 +50,9 @@ public class Main{
             String password= ctx.formParam("password");
             
             // Check username and password and return a cookie
-            if (Database.isLoginValid(username, password)){
+            if (username==null||password==null) {
+                ctx.result("ERROR: Missing form parameters.");
+            } else if (Database.isLoginValid(username, password)){
                 ctx.cookieStore().set("username", username);
                 ctx.result("Login Successful");
             } else {
@@ -72,14 +77,17 @@ public class Main{
                 // Get username from cookie
                 String username = ctx.cookieStore().get("username");
                 // Get form parameters
-                float amount = Float.parseFloat(ctx.formParam("amount"));
+                String amountString = ctx.formParam("amount");
                 String description = ctx.formParam("description");
 
                 if (username == null) {
                     ctx.result("ERROR: Please login before submitting a ticket.");
+                } else if (description==null||amountString==null) {
+                ctx.result("ERROR: Missing form parameters.");
                 } else if (description.equals("")) {
                     ctx.result("ERROR: Description cannot be blank.");
                 } else {
+                    float amount = Float.parseFloat(amountString);
                     Ticket ticket = new Ticket(null, username, amount, description, "Pending");
                     if (Database.createTicket(ticket)) ctx.result("Ticket submitted successfully.");
                 }
@@ -106,13 +114,16 @@ public class Main{
         app.post("/tickets", (Context ctx) -> {
             try{
                 String username = ctx.cookieStore().get("username");
-                int id = Integer.parseInt(ctx.formParam("id"));
+                String idString = ctx.formParam("id");
                 String status = ctx.formParam("status");
                 if (username == null) {
                     ctx.result("ERROR: Please login to process tickets.");
+                } else if (idString==null||status==null) {
+                ctx.result("ERROR: Missing form parameters.");
                 } else if (!status.equals("Approved")&&!status.equals("Denied")){
                     ctx.result("ERROR: Ticked status must be 'Approved' or 'Denied'.");
                 } else if (Database.isManager(username)) {
+                    int id = Integer.parseInt(idString);
                     if (Database.updateTicketStatus(id,status))
                         ctx.result("Ticket "+id+" "+status+".");
                     else ctx.result("Ticket "+id+" is not Pending.");
