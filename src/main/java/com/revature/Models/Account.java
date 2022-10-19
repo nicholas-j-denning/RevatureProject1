@@ -4,14 +4,15 @@ import java.util.Objects;
 
 public class Account {
     private String username;
-    private int passwordHash;
+    private String passwordHash;
     private String legalName;
     private String role;
+
 
     public Account() {
     }
 
-    public Account(String username, int passwordHash, String legalName, String role) {
+    public Account(String username, String passwordHash, String legalName, String role) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.legalName = legalName;
@@ -26,11 +27,11 @@ public class Account {
         this.username = username;
     }
 
-    public int getPasswordHash() {
+    public String getPasswordHash() {
         return this.passwordHash;
     }
 
-    public void setPasswordHash(int passwordHash) {
+    public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
@@ -55,7 +56,7 @@ public class Account {
         return this;
     }
 
-    public Account passwordHash(int passwordHash) {
+    public Account passwordHash(String passwordHash) {
         setPasswordHash(passwordHash);
         return this;
     }
@@ -78,7 +79,7 @@ public class Account {
             return false;
         }
         Account account = (Account) o;
-        return Objects.equals(username, account.username) && passwordHash == account.passwordHash && Objects.equals(legalName, account.legalName) && Objects.equals(role, account.role);
+        return Objects.equals(username, account.username) && Objects.equals(passwordHash, account.passwordHash) && Objects.equals(legalName, account.legalName) && Objects.equals(role, account.role);
     }
 
     @Override

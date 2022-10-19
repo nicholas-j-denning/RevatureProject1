@@ -37,7 +37,7 @@ public class Main{
                 ctx.result("ERROR: Invalid role.");
             } else {
                 // If input is vald, add account the the database
-                Account account = new Account(username, password.hashCode(), legalName, role);
+                Account account = new Account(username, Encrypt.hash(password), legalName, role);
                 if(Database.createAccount(account)) ctx.result("Account created.");
             };
         });

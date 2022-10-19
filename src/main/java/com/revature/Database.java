@@ -93,7 +93,7 @@ abstract class Database {
         String SQL = "INSERT INTO account VALUES(?,?,?,?)";
 		PreparedStatement stmt = connection.prepareStatement(SQL); 
 		stmt.setString(1, account.getUsername());
-		stmt.setInt(2, account.getPasswordHash());
+		stmt.setString(2, account.getPasswordHash());
 		stmt.setString(3, account.getLegalName());
 		stmt.setString(4, account.getRole());
 		return stmt;
@@ -109,9 +109,12 @@ abstract class Database {
 		) {
 
             if (set.next()) {
-				int passwordHash = set.getInt("account_password_hash");
-				int inputHash = password.hashCode();
-				result = (passwordHash == inputHash);
+				String passwordHash = set.getString("account_password_hash");
+				String inputHash = Encrypt.hash(password);
+				System.out.println(passwordHash);
+				System.out.println(inputHash);
+
+				result = (passwordHash.equals(inputHash));
 			}
 
 	
